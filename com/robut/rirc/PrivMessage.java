@@ -18,12 +18,12 @@
 
 package com.robut.rirc;
 
-public class ReceivedMessage {
+public class PrivMessage {
     private String channel;
     private String sender;
     private String message;
 
-    ReceivedMessage(String msgChannel, String msgSender, String msg){
+    PrivMessage(String msgChannel, String msgSender, String msg){
         setChannel(msgChannel);
         setSender(msgSender);
         setMessage(msg);

@@ -15,10 +15,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import com.robut.rirc.Message;
 
 public class Driver {
 
     public static void main(String[] args) {
+        Message msg = new Message(":vypur!vypur@vypur.tmi.twitch.tv PRIVMSG #twitchpresents :ATTACK ME AKIZA moon2L");
 
+        return;
     }
 }

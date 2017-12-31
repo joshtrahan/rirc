@@ -45,13 +45,21 @@ public class IRCConnection {
         this.channels.addAll(autoChannels);
     }
 
-    public void connect() throws IOException {
+    public void connect() throws IOException{
         this.sock = new Socket(this.serverAddress, this.port);
         this.sockIn = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
         this.sockOut = new DataOutputStream(this.sock.getOutputStream());
     }
 
-    public String getMessage(){
-        return "";
+    private String getMessage() throws IOException{
+        if (sock == null || !sock.isConnected()){
+            throw new IOException("Socket isn't connected to a server. Call connect() method first.");
+        }
+
+
+        do {
+            return sockIn.readLine();
+        }
+        while (false);
     }
 }
