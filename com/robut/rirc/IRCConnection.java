@@ -18,7 +18,10 @@
 
 package com.robut.rirc;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -45,21 +48,22 @@ public class IRCConnection {
         this.channels.addAll(autoChannels);
     }
 
-    public void connect() throws IOException{
+    public void connect() throws IOException {
         this.sock = new Socket(this.serverAddress, this.port);
         this.sockIn = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
         this.sockOut = new DataOutputStream(this.sock.getOutputStream());
     }
 
-    private String getMessage() throws IOException{
+    private Message getMessage() throws IOException, RIRCException{
         if (sock == null || !sock.isConnected()){
             throw new IOException("Socket isn't connected to a server. Call connect() method first.");
         }
 
-
-        do {
-            return sockIn.readLine();
+        Message msg = new Message(sockIn.readLine());
+        while (!msg.getOp().equalsIgnoreCase("PRIVMSG")){
+            msg = new Message(sockIn.readLine());
         }
-        while (false);
+
+        return msg;
     }
 }

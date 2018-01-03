@@ -18,10 +18,27 @@
 import com.robut.rirc.Message;
 
 public class Driver {
-
     public static void main(String[] args) {
-        Message msg = new Message(":vypur!vypur@vypur.tmi.twitch.tv PRIVMSG #twitchpresents :ATTACK ME AKIZA moon2L");
+        try {
+            tryMsg(":vypur!vypur@vypur.tmi.twitch.tv PRIVMSG #twitchpresents :ATTACK ME AKIZA moon2L");
+            tryMsg("PING tmi.twitch.tv");
+        }
+        catch (Exception e){
+            System.err.printf("Exception: %s%n", e);
+        }
 
         return;
+    }
+
+    public static void tryMsg(String str) throws Exception{
+        Message msg = new Message(str);
+        System.out.printf("Oper: %s%n", msg.getOp());
+        System.out.printf("User: %s%n", msg.getUser());
+        System.out.printf("Chan: %s%n", msg.getChannel());
+        System.out.printf("Mesg: %s%n%n", msg.getMessage());
+
+        if (msg.getOp().equalsIgnoreCase("PING")) {
+            System.out.println("PONG " + msg.getMessage());
+        }
     }
 }

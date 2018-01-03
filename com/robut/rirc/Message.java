@@ -19,22 +19,35 @@
 package com.robut.rirc;
 
 public class Message {
-    private String user;
-    private String type;
-    private String channel;
-    private String message;
+    private String user = "";
+    private String op = "";
+    private String channel = "";
+    private String message = "";
 
-    public Message(String rawMsg){
-        String[] tokens = rawMsg.split(" ", 4);
+    public Message(String rawMsg) throws RIRCException {
+        String[] tokens = rawMsg.split(" ", 2);
+        String prefix = "";
+        String[] args;
 
-        if (tokens[0].equals("PING")){
-            type = "PING";
+        if (tokens[0].charAt(0) == ':'){
+            prefix = tokens[0].substring(1);
+            tokens = tokens[1].split(" ", 2);
         }
-        else {
-            user = tokens[0].substring(tokens[0].indexOf(':') + 1, tokens[0].indexOf('!'));
-            type = tokens[1];
-            channel = tokens[2].replace("#", "");
-            message = tokens[3].substring(1);
+
+        this.op = tokens[0];
+        args = tokens[1].split(" ", 2);
+
+        if (this.op.equalsIgnoreCase("PRIVMSG")){
+            if (prefix == ""){
+                throw new RIRCException("PRIVMSG received with no prefix.");
+            }
+            this.user = prefix.substring(0, prefix.indexOf('!'));
+            this.channel = args[0].substring(1);
+            this.message = args[1].substring(1);
+        }
+
+        if (this.op.equalsIgnoreCase("PING")){
+            this.message = args[0];
         }
     }
 
@@ -42,8 +55,8 @@ public class Message {
         return this.user;
     }
 
-    public String getType() {
-        return this.type;
+    public String getOp() {
+        return this.op;
     }
 
     public String getChannel() {
