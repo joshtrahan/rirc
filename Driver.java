@@ -20,7 +20,6 @@ import com.robut.rirc.IRCConnection;
 import com.robut.rirc.Message;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
