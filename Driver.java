@@ -27,8 +27,8 @@ public class Driver {
     public static void main(String[] args) {
         String server = "irc.chat.twitch.tv";
         int port = 6667;
-        String userName = "";
-        String auth = "";
+        String userName;
+        String auth;
 
         try (BufferedReader credFile = new BufferedReader(new FileReader("resources/creds.txt"))){
             userName = credFile.readLine();
