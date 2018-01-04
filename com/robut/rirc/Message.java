@@ -26,14 +26,14 @@ public class Message {
     public Message(String msg){
         String[] tokens = msg.split(" ", 2);
         if (tokens[0].charAt(0) == ':'){
-            this.prefix = tokens[0];
+            setPrefix(tokens[0]);
             tokens = tokens[1].split(" ", 2);
         }
 
-        this.op = tokens[0];
+        setOp(tokens[0]);
 
         if (tokens.length > 1) {
-            this.args = tokens[1];
+            setArgs(tokens[1]);
         }
     }
 
@@ -47,6 +47,18 @@ public class Message {
 
     public String getArgs() {
         return this.args;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public void setOp(String op) {
+        this.op = op.toUpperCase();
+    }
+
+    public void setArgs(String args) {
+        this.args = args;
     }
 
     @Override
