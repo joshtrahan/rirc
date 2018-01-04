@@ -17,7 +17,7 @@
  */
 
 import com.robut.rirc.IRCConnection;
-import com.robut.rirc.Message;
+import com.robut.rirc.PrivMsg;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -31,13 +31,13 @@ public class Driver {
         ArrayList<String> channelList = new ArrayList<>();
         channelList.add("twitchpresents");
 
-        try {
-            BufferedReader credFile = new BufferedReader(new FileReader("resources/creds.txt"));
+        try (BufferedReader credFile = new BufferedReader(new FileReader("resources/creds.txt"));){
             userName = credFile.readLine();
             auth = credFile.readLine();
+            credFile.close();
         }
         catch (Exception e){
-            System.err.printf("Exception: %s%n", e);
+            System.err.printf("Exception reading credentials: %s%n", e);
             return;
         }
 
@@ -53,29 +53,13 @@ public class Driver {
 
         while (true){
             try{
-                Message msg = conn.getMessage();
-                printMsg(msg);
+                PrivMsg msg = conn.getMessage();
+                System.out.printf("%s%n", msg);
             }
             catch (Exception e){
                 System.err.printf("Exception getting message: %s%n", e);
                 break;
             }
         }
-    }
-
-    public static void tryMsg(String str) throws Exception{
-        Message msg = new Message(str);
-        printMsg(msg);
-
-        if (msg.getOp().equalsIgnoreCase("PING")) {
-            System.out.println("PONG " + msg.getMessage());
-        }
-    }
-
-    public static void printMsg(Message msg){
-        System.out.printf("Oper: %s%n", msg.getOp());
-        System.out.printf("User: %s%n", msg.getUser());
-        System.out.printf("Chan: %s%n", msg.getChannel());
-        System.out.printf("Mesg: %s%n%n", msg.getMessage());
     }
 }

@@ -61,9 +61,13 @@ public class IRCConnection {
         System.out.printf("Finished connecting.%n");
 
         for (String channel : channels){
-            System.out.printf("Joining channel %s%n", channel);
+            System.out.printf("Joining channel #%s%n", channel);
             joinChannel(channel);
         }
+    }
+
+    public void disconnect() throws IOException {
+        this.sock.close();
     }
 
     public void joinChannel(String channelName) throws IOException{
@@ -75,24 +79,30 @@ public class IRCConnection {
         }
     }
 
-    public Message getMessage() throws IOException, RIRCException{
+    public PrivMsg getMessage() throws IOException, RIRCException{
         if (sock == null || !sock.isConnected()){
             throw new IOException("Socket isn't connected to a server. Call connect() method first.");
         }
 
-        String rawMsg = sockIn.readLine();
-        Message msg = new Message(rawMsg);
+        Message msg = new Message(sockIn.readLine());
         while (!msg.getOp().equalsIgnoreCase("PRIVMSG")){
-            System.out.printf("Message: %s%n%n", rawMsg);
+            System.out.printf("op: %s%nprefix: %s%nargs: %s%n%n", msg.getOp(), msg.getPrefix(), msg.getArgs());
             msg = new Message(sockIn.readLine());
         }
 
-        return msg;
+        return new PrivMsg(msg);
     }
 
-    public void writeMessage(String msg) throws IOException {
+    public void sendMessage(String channel, String message) throws IOException, RIRCException {
+        if (!channels.contains(channel)){
+            throw new RIRCException("A channel should be joined before a message can be sent to it.");
+        }
+        writeMessage("PRIVMSG #" + channel + " :" + message);
+    }
+
+    private void writeMessage(String msg) throws IOException {
         if (msg.contains("\r\n")){
-            throw new IOException("Error: Message contains newline characters.");
+            throw new IOException("Error: PrivMsg contains newline characters.");
         }
         this.sockOut.write((msg + "\r\n").getBytes("UTF-8"));
     }
