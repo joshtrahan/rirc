@@ -87,17 +87,32 @@ public class IRCConnection {
         Message msg = new Message(sockIn.readLine());
         while (!msg.getOp().equalsIgnoreCase("PRIVMSG")){
             System.out.printf("op: %s%nprefix: %s%nargs: %s%n%n", msg.getOp(), msg.getPrefix(), msg.getArgs());
+            handleNonPrivMsg(msg);
             msg = new Message(sockIn.readLine());
         }
 
         return new PrivMsg(msg);
     }
 
-    public void sendMessage(String channel, String message) throws IOException, RIRCException {
+    public void sendPrivMsg(String channel, String message) throws IOException, RIRCException {
         if (!channels.contains(channel)){
             throw new RIRCException("A channel should be joined before a message can be sent to it.");
         }
         writeMessage("PRIVMSG #" + channel + " :" + message);
+    }
+
+    private void handleNonPrivMsg(Message msg) throws IOException{
+        switch (msg.getOp()){
+            case "PING":
+                handlePing(msg);
+                break;
+        }
+    }
+
+    private void handlePing(Message msg) throws IOException{
+        String pongMsg = "PONG " + msg.getArgs();
+        System.out.printf("Received ping. Responding with pong: %s%n%n", pongMsg);
+        writeMessage(pongMsg);
     }
 
     private void writeMessage(String msg) throws IOException {

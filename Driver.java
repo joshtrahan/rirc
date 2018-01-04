@@ -22,16 +22,15 @@ import com.robut.rirc.PrivMsg;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class Driver {
     public static void main(String[] args) {
+        String server = "irc.chat.twitch.tv";
+        int port = 6667;
         String userName = "";
         String auth = "";
-        ArrayList<String> channelList = new ArrayList<>();
-        channelList.add("twitchpresents");
 
-        try (BufferedReader credFile = new BufferedReader(new FileReader("resources/creds.txt"));){
+        try (BufferedReader credFile = new BufferedReader(new FileReader("resources/creds.txt"))){
             userName = credFile.readLine();
             auth = credFile.readLine();
             credFile.close();
@@ -41,7 +40,12 @@ public class Driver {
             return;
         }
 
-        IRCConnection conn = new IRCConnection("irc.chat.twitch.tv", 6667, userName, auth);
+        testConnection(server, port, userName, auth);
+    }
+
+    public static void testConnection(String server, int port, String userName, String auth){
+        IRCConnection conn = new IRCConnection(server, port, userName, auth);
+
         try {
             conn.connect();
             conn.joinChannel("twitchpresents");
@@ -51,15 +55,14 @@ public class Driver {
             return;
         }
 
-        while (true){
-            try{
+        try{
+            while (true) {
                 PrivMsg msg = conn.getMessage();
                 System.out.printf("%s%n", msg);
             }
-            catch (Exception e){
-                System.err.printf("Exception getting message: %s%n", e);
-                break;
-            }
+        }
+        catch (Exception e){
+            System.err.printf("Exception getting message: %s%n", e);
         }
     }
 }
