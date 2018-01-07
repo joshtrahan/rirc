@@ -63,10 +63,10 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message{" +
-                "prefix='" + prefix + '\'' +
-                ", op='" + op + '\'' +
-                ", args='" + args + '\'' +
+        return "Message{" + '\n' +
+                "\top: " + op + '\n' +
+                "\tprefix: " + prefix + '\n' +
+                "\targs: " + args + '\n' +
                 '}';
     }
 }

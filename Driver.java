@@ -22,13 +22,25 @@ import com.robut.rirc.PrivMsg;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class Driver {
     public static void main(String[] args) {
-        String server = "irc.chat.twitch.tv";
+        String server = null;
         int port = 6667;
         String userName;
         String auth;
+        String[] channels = new String[0];
+
+        if (args.length >= 2){
+            server = args[0];
+            port = Integer.parseInt(args[1]);
+        }
+        if (args.length > 2){
+            channels = Arrays.copyOfRange(args, 2, args.length);
+        }
 
         try (BufferedReader credFile = new BufferedReader(new FileReader("resources/creds.txt"))){
             userName = credFile.readLine();
@@ -40,11 +52,22 @@ public class Driver {
             return;
         }
 
-        testConnection(server, port, userName, auth);
+        try {
+            testConnection(server, port, userName, auth, Arrays.asList(channels));
+        }
+        catch (IOException e){
+            System.err.printf("Exception connecting to server: %s%n", e);
+        }
     }
 
-    public static void testConnection(String server, int port, String userName, String auth){
-        IRCConnection conn = new IRCConnection(server, port, userName, auth);
+    public static void testConnection(String server, int port, String userName, String auth, Collection channels)
+    throws IOException
+    {
+        if (server == null) {
+            throw new IOException("No server specified.");
+        }
+
+        IRCConnection conn = new IRCConnection(server, port, userName, auth, channels);
 
         try {
             conn.connect();

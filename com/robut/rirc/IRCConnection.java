@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class IRCConnection {
     private String serverAddress;
@@ -43,7 +44,8 @@ public class IRCConnection {
         this.auth = userAuth;
     }
 
-    public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth, ArrayList<String> autoChannels){
+    public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth,
+                         Collection autoChannels){
         this(serverURL, serverPort, userNick, userAuth);
         this.channels.addAll(autoChannels);
     }
@@ -86,7 +88,7 @@ public class IRCConnection {
 
         Message msg = new Message(sockIn.readLine());
         while (!msg.getOp().equalsIgnoreCase("PRIVMSG")){
-            System.out.printf("op: %s%nprefix: %s%nargs: %s%n%n", msg.getOp(), msg.getPrefix(), msg.getArgs());
+            System.out.printf("%s%n%n", msg.toString());
             handleNonPrivMsg(msg);
             msg = new Message(sockIn.readLine());
         }
