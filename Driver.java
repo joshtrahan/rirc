@@ -27,35 +27,32 @@ import java.util.Collection;
 
 public class Driver {
     public static void main(String[] args) {
-        String server = null;
-        int port = 6667;
-        String userName;
-        String auth;
-        String[] channels = new String[0];
+        if (args.length > 0) {
+            String server = args[0];
+            int port = Integer.parseInt(args[1]);
+            String[] channels = new String[0];
 
-        if (args.length >= 2){
-            server = args[0];
-            port = Integer.parseInt(args[1]);
-        }
-        if (args.length > 2){
-            channels = Arrays.copyOfRange(args, 2, args.length);
-        }
+            String userName;
+            String auth;
 
-        try (BufferedReader credFile = new BufferedReader(new FileReader("resources/creds.txt"))){
-            userName = credFile.readLine();
-            auth = credFile.readLine();
-            credFile.close();
-        }
-        catch (Exception e){
-            System.err.printf("Exception reading credentials: %s%n", e);
-            return;
-        }
+            if (args.length > 2) {
+                channels = Arrays.copyOfRange(args, 2, args.length);
+            }
 
-        try {
-            testConnection(server, port, userName, auth, Arrays.asList(channels));
-        }
-        catch (IOException e){
-            System.err.printf("Exception connecting to server: %s%n", e);
+            try (BufferedReader credFile = new BufferedReader(new FileReader("resources/creds.txt"))) {
+                userName = credFile.readLine();
+                auth = credFile.readLine();
+                credFile.close();
+            } catch (Exception e) {
+                System.err.printf("Exception reading credentials: %s%n", e);
+                return;
+            }
+
+            try {
+                testConnection(server, port, userName, auth, Arrays.asList(channels));
+            } catch (IOException e) {
+                System.err.printf("Exception connecting to server: %s%n", e);
+            }
         }
     }
 
