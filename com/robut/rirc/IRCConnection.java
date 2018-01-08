@@ -89,6 +89,10 @@ public class IRCConnection {
         return this.channels.toArray(new String[this.channels.size()]);
     }
 
+    public String getServerAddress(){
+        return this.serverAddress;
+    }
+
     public PrivMsg getMessage() throws IOException, RIRCException{
         if (sock == null || !sock.isConnected()){
             throw new IOException("Socket isn't connected to a server. Call connect() method first.");
