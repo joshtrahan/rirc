@@ -93,6 +93,14 @@ public class IRCConnection {
         return this.serverAddress;
     }
 
+    public int getPort(){
+        return this.port;
+    }
+
+    public String getNick(){
+        return this.nick;
+    }
+
     public PrivMsg getMessage() throws IOException, RIRCException{
         if (sock == null || !sock.isConnected()){
             throw new IOException("Socket isn't connected to a server. Call connect() method first.");
