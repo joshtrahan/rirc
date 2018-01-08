@@ -68,6 +68,10 @@ public class IRCConnection {
         }
     }
 
+    public boolean isConnected(){
+        return this.sock.isConnected();
+    }
+
     public void disconnect() throws IOException {
         this.sock.close();
     }
