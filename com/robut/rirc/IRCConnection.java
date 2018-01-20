@@ -25,13 +25,16 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class IRCConnection {
+public class IRCConnection implements Runnable{
     private String serverAddress;
     private int port;
     private ArrayList<String> channels = new ArrayList<>();
     private String nick;
     private String auth;
+
+    private LinkedBlockingQueue<PrivMsg> privMsgQueue = new LinkedBlockingQueue<>();
 
     private Socket sock;
     private BufferedReader sockIn;
@@ -66,6 +69,26 @@ public class IRCConnection {
             System.out.printf("Joining channel #%s%n", channel);
             joinChannel(channel);
         }
+    }
+
+    public void run() {
+        try {
+            connect();
+        } catch (IOException e) {
+            System.err.printf("Exception connecting to server: %s%n", e);
+        }
+
+        while (isConnected()) {
+            try {
+                privMsgQueue.add(getMessage());
+            } catch (Exception e) {
+                System.err.printf("Exception getting privmsg: %s%n", e);
+            }
+        }
+    }
+
+    public PrivMsg getMessage() throws InterruptedException{
+        return privMsgQueue.take();
     }
 
     public boolean isConnected(){
@@ -105,7 +128,7 @@ public class IRCConnection {
         return this.nick;
     }
 
-    public PrivMsg getMessage() throws IOException, RIRCException{
+    public void getPrivMsgFromServer() throws IOException, RIRCException{
         if (sock == null || !sock.isConnected()){
             throw new IOException("Socket isn't connected to a server. Call connect() method first.");
         }
@@ -117,7 +140,7 @@ public class IRCConnection {
             msg = new Message(sockIn.readLine());
         }
 
-        return new PrivMsg(msg);
+        this.privMsgQueue.add(new PrivMsg(msg));
     }
 
     public void sendPrivMsg(String channel, String message) throws IOException, RIRCException {

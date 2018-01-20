@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.robut.rirc.IRCConnection;
+import com.robut.rirc.RIRCClient;
 import com.robut.rirc.PrivMsg;
 
 import java.io.BufferedReader;
@@ -63,13 +63,12 @@ public class Driver {
             throw new IOException("No server specified.");
         }
 
-        IRCConnection conn = new IRCConnection(server, port, userName, auth, channels);
+        RIRCClient conn = new RIRCClient(server, port, userName, auth, channels);
 
         try {
-            conn.connect();
-            conn.joinChannel("twitchpresents");
+            conn.start();
         }
-        catch (IOException e){
+        catch (Exception e){
             System.err.printf("Exception connecting: %s%n");
             return;
         }
