@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.robut.rirc.RIRCClient;
+import com.robut.rirc.Client;
 import com.robut.rirc.PrivMsg;
 
 import java.io.BufferedReader;
@@ -65,7 +65,7 @@ public class Driver {
 
         TestMsgHandler msgHandler = new TestMsgHandler();
 
-        RIRCClient conn = new RIRCClient(server, port, userName, auth, channels, msgHandler);
+        Client conn = new Client(server, port, userName, auth, channels, msgHandler);
         conn.start();
     }
 
@@ -76,7 +76,7 @@ public class Driver {
             throw new IOException("No server specified.");
         }
 
-        RIRCClient conn = new RIRCClient(server, port, userName, auth, channels);
+        Client conn = new Client(server, port, userName, auth, channels);
 
         try {
             conn.start();

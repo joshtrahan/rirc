@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class IRCConnection implements Runnable{
+public class Connection implements Runnable{
     private String serverAddress;
     private int port;
     private ArrayList<String> channels = new ArrayList<>();
@@ -41,21 +41,21 @@ public class IRCConnection implements Runnable{
     private BufferedReader sockIn;
     private DataOutputStream sockOut;
 
-    public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth){
+    public Connection(String serverURL, int serverPort, String userNick, String userAuth){
         this.serverAddress = serverURL;
         this.port = serverPort;
         this.nick = userNick;
         this.auth = userAuth;
     }
 
-    public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth,
-                         Collection autoChannels){
+    public Connection(String serverURL, int serverPort, String userNick, String userAuth,
+                      Collection autoChannels){
         this(serverURL, serverPort, userNick, userAuth);
         this.channels.addAll(autoChannels);
     }
 
-    public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth,
-                         PrivMsgHandler msgHandler){
+    public Connection(String serverURL, int serverPort, String userNick, String userAuth,
+                      PrivMsgHandler msgHandler){
         this.serverAddress = serverURL;
         this.port = serverPort;
         this.nick = userNick;
@@ -64,8 +64,8 @@ public class IRCConnection implements Runnable{
         this.privMsgHandler = msgHandler;
     }
 
-    public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth,
-                         Collection autoChannels, PrivMsgHandler msgHandler){
+    public Connection(String serverURL, int serverPort, String userNick, String userAuth,
+                      Collection autoChannels, PrivMsgHandler msgHandler){
         this(serverURL, serverPort, userNick, userAuth, msgHandler);
         this.channels.addAll(autoChannels);
     }
