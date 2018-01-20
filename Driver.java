@@ -49,14 +49,27 @@ public class Driver {
             }
 
             try {
-                testConnection(server, port, userName, auth, Arrays.asList(channels));
+                testAsync(server, port, userName, auth, Arrays.asList(channels));
+                //testSynchronous(server, port, userName, auth, Arrays.asList(channels));
             } catch (IOException e) {
                 System.err.printf("Exception connecting to server: %s%n", e);
             }
         }
     }
 
-    public static void testConnection(String server, int port, String userName, String auth, Collection channels)
+    public static void testAsync(String server, int port, String userName, String auth, Collection channels)
+    throws IOException {
+        if (server == null) {
+            throw new IOException("No server specified.");
+        }
+
+        TestMsgHandler msgHandler = new TestMsgHandler();
+
+        RIRCClient conn = new RIRCClient(server, port, userName, auth, channels, msgHandler);
+        conn.start();
+    }
+
+    public static void testSynchronous(String server, int port, String userName, String auth, Collection channels)
     throws IOException
     {
         if (server == null) {

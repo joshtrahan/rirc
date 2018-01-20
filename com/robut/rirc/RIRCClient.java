@@ -15,11 +15,23 @@ public class RIRCClient {
         conn = new IRCConnection(serverURL, serverPort, userNick, userAuth, channels);
     }
 
-    public void start(){
-        (new Thread(conn)).start();
+    public RIRCClient(String serverURL, int serverPort, String userNick, String userAuth,
+                      PrivMsgHandler msgHandler){
+        conn = new IRCConnection(serverURL, serverPort, userNick, userAuth, msgHandler);
     }
 
-    public PrivMsg getMessage() throws InterruptedException{
+    public RIRCClient(String serverURL, int serverPort, String userNick, String userAuth,
+                      Collection channels, PrivMsgHandler msgHandler){
+        conn = new IRCConnection(serverURL, serverPort, userNick, userAuth, channels, msgHandler);
+    }
+
+    public void start(){
+        Thread connThread = new Thread(conn);
+        connThread.setDaemon(false);
+        connThread.start();
+    }
+
+    public PrivMsg getMessage() throws InterruptedException, RIRCException{
         return conn.getMessage();
     }
 }

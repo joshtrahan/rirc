@@ -34,7 +34,8 @@ public class IRCConnection implements Runnable{
     private String nick;
     private String auth;
 
-    private LinkedBlockingQueue<PrivMsg> privMsgQueue = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<PrivMsg> privMsgQueue;
+    private PrivMsgHandler privMsgHandler;
 
     private Socket sock;
     private BufferedReader sockIn;
@@ -50,6 +51,22 @@ public class IRCConnection implements Runnable{
     public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth,
                          Collection autoChannels){
         this(serverURL, serverPort, userNick, userAuth);
+        this.channels.addAll(autoChannels);
+    }
+
+    public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth,
+                         PrivMsgHandler msgHandler){
+        this.serverAddress = serverURL;
+        this.port = serverPort;
+        this.nick = userNick;
+        this.auth = userAuth;
+
+        this.privMsgHandler = msgHandler;
+    }
+
+    public IRCConnection(String serverURL, int serverPort, String userNick, String userAuth,
+                         Collection autoChannels, PrivMsgHandler msgHandler){
+        this(serverURL, serverPort, userNick, userAuth, msgHandler);
         this.channels.addAll(autoChannels);
     }
 
@@ -80,14 +97,17 @@ public class IRCConnection implements Runnable{
 
         while (isConnected()) {
             try {
-                privMsgQueue.add(getMessage());
+                getPrivMsgFromServer();
             } catch (Exception e) {
                 System.err.printf("Exception getting privmsg: %s%n", e);
             }
         }
     }
 
-    public PrivMsg getMessage() throws InterruptedException{
+    public PrivMsg getMessage() throws InterruptedException, RIRCException{
+        if (this.privMsgHandler != null){
+            throw new RIRCException("PrivMsgs are already being retrieved by a handler class.");
+        }
         return privMsgQueue.take();
     }
 
@@ -140,7 +160,12 @@ public class IRCConnection implements Runnable{
             msg = new Message(sockIn.readLine());
         }
 
-        this.privMsgQueue.add(new PrivMsg(msg));
+        if (this.privMsgHandler != null){
+            this.privMsgHandler.handleNewMessage(new PrivMsg(msg));
+        }
+        else {
+            this.privMsgQueue.add(new PrivMsg(msg));
+        }
     }
 
     public void sendPrivMsg(String channel, String message) throws IOException, RIRCException {
