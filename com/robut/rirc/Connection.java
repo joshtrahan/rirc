@@ -70,7 +70,7 @@ class Connection implements Runnable{
         this.channels.addAll(autoChannels);
     }
 
-    public void connect() throws IOException {
+    public synchronized void connect() throws IOException {
         this.sock = new Socket(this.serverAddress, this.port);
         this.sockIn = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
         this.sockOut = new DataOutputStream(this.sock.getOutputStream());
@@ -104,22 +104,22 @@ class Connection implements Runnable{
         }
     }
 
-    public PrivMsg getMessage() throws InterruptedException, RIRCException{
+    public synchronized PrivMsg getMessage() throws InterruptedException, RIRCException{
         if (this.privMsgHandler != null){
             throw new RIRCException("PrivMsgs are already being retrieved by a handler class.");
         }
         return privMsgQueue.take();
     }
 
-    public boolean isConnected(){
+    public synchronized boolean isConnected(){
         return this.sock.isConnected();
     }
 
-    public void disconnect() throws IOException {
+    public synchronized void disconnect() throws IOException {
         this.sock.close();
     }
 
-    public void joinChannel(String channelName) throws IOException{
+    public synchronized void joinChannel(String channelName) throws IOException{
         if (!channels.contains(channelName)){
             channels.add(channelName);
         }
@@ -128,15 +128,15 @@ class Connection implements Runnable{
         }
     }
 
-    public boolean isChannelJoined(String channel){
+    public synchronized boolean isChannelJoined(String channel){
         return this.channels.contains(channel);
     }
 
-    public String[] getChannelsJoined(){
+    public synchronized String[] getChannelsJoined(){
         return this.channels.toArray(new String[this.channels.size()]);
     }
 
-    public String getServerAddress(){
+    public synchronized String getServerAddress(){
         return this.serverAddress;
     }
 
@@ -148,11 +148,11 @@ class Connection implements Runnable{
         return this.nick;
     }
 
-    public PrivMsgHandler getPrivMsgHandler(){
+    public synchronized PrivMsgHandler getPrivMsgHandler(){
         return this.privMsgHandler;
     }
 
-    public void getPrivMsgFromServer() throws IOException, RIRCException{
+    public synchronized void getPrivMsgFromServer() throws IOException, RIRCException{
         if (sock == null || !sock.isConnected()){
             throw new IOException("Socket isn't connected to a server. Call connect() method first.");
         }
@@ -172,14 +172,14 @@ class Connection implements Runnable{
         }
     }
 
-    public void sendPrivMsg(String channel, String message) throws IOException, RIRCException {
+    public synchronized void sendPrivMsg(String channel, String message) throws IOException, RIRCException {
         if (!channels.contains(channel)){
             throw new RIRCException("A channel should be joined before a message can be sent to it.");
         }
         writeMessage("PRIVMSG #" + channel + " :" + message);
     }
 
-    private void handleNonPrivMsg(Message msg) throws IOException{
+    private synchronized void handleNonPrivMsg(Message msg) throws IOException{
         switch (msg.getOp()){
             case "PING":
                 handlePing(msg);
@@ -187,13 +187,13 @@ class Connection implements Runnable{
         }
     }
 
-    private void handlePing(Message msg) throws IOException{
+    private synchronized void handlePing(Message msg) throws IOException{
         String pongMsg = "PONG " + msg.getArgs();
         System.out.printf("Received ping. Responding with pong: %s%n%n", pongMsg);
         writeMessage(pongMsg);
     }
 
-    private void writeMessage(String msg) throws IOException {
+    private synchronized void writeMessage(String msg) throws IOException {
         if (msg.contains("\r\n")){
             throw new IOException("Error: PrivMsg contains newline characters.");
         }
