@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Connection implements Runnable{
+class Connection implements Runnable{
     private String serverAddress;
     private int port;
     private ArrayList<String> channels = new ArrayList<>();

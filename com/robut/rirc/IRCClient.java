@@ -20,25 +20,25 @@ package com.robut.rirc;
 
 import java.util.Collection;
 
-public class Client {
+public class IRCClient {
     private Connection conn;
 
-    public Client(String serverURL, int serverPort, String userNick, String userAuth){
+    public IRCClient(String serverURL, int serverPort, String userNick, String userAuth){
         conn = new Connection(serverURL, serverPort, userNick, userAuth);
     }
 
-    public Client(String serverURL, int serverPort, String userNick, String userAuth,
-                  Collection channels){
+    public IRCClient(String serverURL, int serverPort, String userNick, String userAuth,
+                     Collection channels){
         conn = new Connection(serverURL, serverPort, userNick, userAuth, channels);
     }
 
-    public Client(String serverURL, int serverPort, String userNick, String userAuth,
-                  PrivMsgHandler msgHandler){
+    public IRCClient(String serverURL, int serverPort, String userNick, String userAuth,
+                     PrivMsgHandler msgHandler){
         conn = new Connection(serverURL, serverPort, userNick, userAuth, msgHandler);
     }
 
-    public Client(String serverURL, int serverPort, String userNick, String userAuth,
-                  Collection channels, PrivMsgHandler msgHandler){
+    public IRCClient(String serverURL, int serverPort, String userNick, String userAuth,
+                     Collection channels, PrivMsgHandler msgHandler){
         conn = new Connection(serverURL, serverPort, userNick, userAuth, channels, msgHandler);
     }
 
