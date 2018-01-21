@@ -66,7 +66,7 @@ public class Driver {
         TestMsgHandler msgHandler = new TestMsgHandler();
 
         IRCClient conn = new IRCClient(server, port, userName, auth, channels, msgHandler);
-        conn.start();
+        conn.startThread();
     }
 
     public static void testSynchronous(String server, int port, String userName, String auth, Collection channels)
@@ -79,7 +79,7 @@ public class Driver {
         IRCClient conn = new IRCClient(server, port, userName, auth, channels);
 
         try {
-            conn.start();
+            conn.startThread();
         }
         catch (Exception e){
             System.err.printf("Exception connecting: %s%n");
