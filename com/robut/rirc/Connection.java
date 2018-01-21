@@ -148,6 +148,10 @@ class Connection implements Runnable{
         return this.nick;
     }
 
+    public PrivMsgHandler getPrivMsgHandler(){
+        return this.privMsgHandler;
+    }
+
     public void getPrivMsgFromServer() throws IOException, RIRCException{
         if (sock == null || !sock.isConnected()){
             throw new IOException("Socket isn't connected to a server. Call connect() method first.");

@@ -51,4 +51,8 @@ public class IRCClient {
     public PrivMsg getMessage() throws InterruptedException, RIRCException{
         return conn.getMessage();
     }
+
+    public PrivMsgHandler getPrivMsgHandler(){
+        return conn.getPrivMsgHandler();
+    }
 }
