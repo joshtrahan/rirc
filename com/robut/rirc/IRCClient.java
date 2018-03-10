@@ -103,7 +103,6 @@ public class IRCClient implements Runnable{
             }
             writeMessage("JOIN #" + channelName);
         }
-
         else{
             this.channelsToJoin.add(channelName);
         }
@@ -131,12 +130,7 @@ public class IRCClient implements Runnable{
                 break;
 
             case "376":
-                System.out.printf("Channels should now be joinable.%n");
-                this.channelsJoinable = true;
-                for (String channel : channelsToJoin){
-                    joinChannel(channel);
-                }
-                channelsToJoin.clear();
+                handleNowJoinable();
                 break;
         }
     }
@@ -154,6 +148,15 @@ public class IRCClient implements Runnable{
         catch (RIRCException e){
             System.err.printf("Error handling PrivMsg: %s%n");
         }
+    }
+
+    private synchronized void handleNowJoinable() throws IOException{
+        System.out.printf("Channels should now be joinable.%n");
+        this.channelsJoinable = true;
+        for (String channel : channelsToJoin){
+            joinChannel(channel);
+        }
+        channelsToJoin.clear();
     }
 
     private Message getMessage() throws IOException {
