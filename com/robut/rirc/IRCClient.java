@@ -41,19 +41,6 @@ public class IRCClient implements Runnable{
     private BufferedReader sockIn;
     private DataOutputStream sockOut;
 
-    public IRCClient(String serverURL, int serverPort, String userNick, String userAuth){
-        this.serverAddress = serverURL;
-        this.port = serverPort;
-        this.nick = userNick;
-        this.auth = userAuth;
-    }
-
-    public IRCClient(String serverURL, int serverPort, String userNick, String userAuth,
-                     Collection autoChannels){
-        this(serverURL, serverPort, userNick, userAuth);
-        this.channels.addAll(autoChannels);
-    }
-
     public IRCClient(String serverURL, int serverPort, String userNick, String userAuth,
                      PrivMsgHandler msgHandler){
         this.serverAddress = serverURL;
@@ -62,12 +49,6 @@ public class IRCClient implements Runnable{
         this.auth = userAuth;
 
         this.privMsgHandler = msgHandler;
-    }
-
-    public IRCClient(String serverURL, int serverPort, String userNick, String userAuth,
-                     Collection autoChannels, PrivMsgHandler msgHandler){
-        this(serverURL, serverPort, userNick, userAuth, msgHandler);
-        this.channels.addAll(autoChannels);
     }
 
     public synchronized void connect() throws IOException {
@@ -81,11 +62,6 @@ public class IRCClient implements Runnable{
         writeMessage("NICK " + this.nick);
 
         System.out.printf("Finished connecting.%n");
-
-        for (String channel : channels){
-            System.out.printf("Joining channel #%s%n", channel);
-            joinChannel(channel);
-        }
     }
 
     public void startThread(){
@@ -125,7 +101,7 @@ public class IRCClient implements Runnable{
         this.sock.close();
     }
 
-    public synchronized void joinChannel(String channelName) throws IOException{
+    public void joinChannel(String channelName) throws IOException{
         if (!channels.contains(channelName)){
             channels.add(channelName);
         }
@@ -174,6 +150,7 @@ public class IRCClient implements Runnable{
             this.privMsgHandler.handleNewMessage(new PrivMsg(msg));
         }
         else {
+            System.err.printf("Error: No PrivMsgHandler present. Adding to message queue.%n");
             this.privMsgQueue.add(new PrivMsg(msg));
         }
     }
@@ -199,7 +176,7 @@ public class IRCClient implements Runnable{
         writeMessage(pongMsg);
     }
 
-    private synchronized void writeMessage(String msg) throws IOException {
+    private void writeMessage(String msg) throws IOException {
         if (msg.contains("\r\n")){
             throw new IOException("Error: PrivMsg contains newline characters.");
         }

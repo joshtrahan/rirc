@@ -17,13 +17,13 @@
  */
 
 import com.robut.rirc.IRCClient;
-import com.robut.rirc.PrivMsg;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 public class Driver {
     public static void main(String[] args) {
@@ -57,7 +57,7 @@ public class Driver {
         }
     }
 
-    public static void testAsync(String server, int port, String userName, String auth, Collection channels)
+    public static void testAsync(String server, int port, String userName, String auth, Collection<String> channels)
     throws IOException {
         if (server == null) {
             throw new IOException("No server specified.");
@@ -65,35 +65,47 @@ public class Driver {
 
         TestMsgHandler msgHandler = new TestMsgHandler();
 
-        IRCClient conn = new IRCClient(server, port, userName, auth, channels, msgHandler);
+        IRCClient conn = new IRCClient(server, port, userName, auth, msgHandler);
+
         conn.startThread();
-    }
-
-    public static void testSynchronous(String server, int port, String userName, String auth, Collection channels)
-    throws IOException
-    {
-        if (server == null) {
-            throw new IOException("No server specified.");
-        }
-
-        IRCClient conn = new IRCClient(server, port, userName, auth, channels);
 
         try {
-            conn.startThread();
+            TimeUnit.SECONDS.sleep(3);
         }
-        catch (Exception e){
-            System.err.printf("Exception connecting: %s%n");
-            return;
+        catch (InterruptedException e){
+            System.err.printf("Sleep interrupted: %s%n");
         }
 
-        try{
-            while (true) {
-                PrivMsg msg = conn.getMessage();
-                System.out.printf("%s%n", msg);
-            }
-        }
-        catch (Exception e){
-            System.err.printf("Exception getting message: %s%n", e);
+        for (String channel : channels){
+            conn.joinChannel(channel);
         }
     }
+
+//    public static void testSynchronous(String server, int port, String userName, String auth, Collection channels)
+//    throws IOException
+//    {
+//        if (server == null) {
+//            throw new IOException("No server specified.");
+//        }
+//
+//        IRCClient conn = new IRCClient(server, port, userName, auth);
+//
+//        try {
+//            conn.startThread();
+//        }
+//        catch (Exception e){
+//            System.err.printf("Exception connecting: %s%n");
+//            return;
+//        }
+//
+//        try{
+//            while (true) {
+//                PrivMsg msg = conn.getMessage();
+//                System.out.printf("%s%n", msg);
+//            }
+//        }
+//        catch (Exception e){
+//            System.err.printf("Exception getting message: %s%n", e);
+//        }
+//    }
 }
