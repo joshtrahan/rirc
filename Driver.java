@@ -48,19 +48,19 @@ public class Driver {
                 return;
             }
 
-            try {
-                testAsync(server, port, userName, auth, Arrays.asList(channels));
-                //testSynchronous(server, port, userName, auth, Arrays.asList(channels));
-            } catch (IOException e) {
-                System.err.printf("Exception connecting to server: %s%n", e);
-            }
+
+            testAsync(server, port, userName, auth, Arrays.asList(channels));
+//            try {
+//                testSynchronous(server, port, userName, auth, Arrays.asList(channels));
+//            } catch (IOException e) {
+//                System.err.printf("Exception connecting to server: %s%n", e);
+//            }
         }
     }
 
-    public static void testAsync(String server, int port, String userName, String auth, Collection<String> channels)
-    throws IOException {
+    public static void testAsync(String server, int port, String userName, String auth, Collection<String> channels){
         if (server == null) {
-            throw new IOException("No server specified.");
+            return;
         }
 
         TestMsgHandler msgHandler = new TestMsgHandler();
@@ -69,15 +69,13 @@ public class Driver {
 
         conn.startThread();
 
-        try {
-            TimeUnit.SECONDS.sleep(3);
-        }
-        catch (InterruptedException e){
-            System.err.printf("Sleep interrupted: %s%n");
-        }
-
         for (String channel : channels){
-            conn.joinChannel(channel);
+            try {
+                conn.joinChannel(channel);
+            }
+            catch (IOException e){
+                System.err.printf("Error joining channel: %s%n");
+            }
         }
     }
 
