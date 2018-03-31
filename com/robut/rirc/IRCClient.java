@@ -18,6 +18,7 @@
 
 package com.robut.rirc;
 
+import javax.management.OperationsException;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -28,6 +29,10 @@ import java.util.ArrayList;
 public class IRCClient implements Runnable{
     private String serverAddress;
     private int port;
+
+    private boolean tryReconnect = false;
+    private int reconnecTimeMillis = 5000;
+
     private ArrayList<String> channels = new ArrayList<>();
     private ArrayList<String> channelsToJoin = new ArrayList<>();
     private String nick;
@@ -63,6 +68,8 @@ public class IRCClient implements Runnable{
         System.out.printf("Sending nick: %s%n", this.nick);
         writeMessage("NICK " + this.nick);
 
+        this.tryReconnect = true;
+
         System.out.printf("Finished connecting.%n");
     }
 
@@ -80,17 +87,30 @@ public class IRCClient implements Runnable{
             System.err.printf("Error connecting: %s%n", e);
         }
 
-        while (isConnected()) {
-            try {
-                getServerMessage();
-            } catch (Exception e) {
-                System.err.printf("Exception getting message: %s%n", e);
-                break;
+        while (this.tryReconnect) {
+            if (isConnected()) {
+                try {
+                    getServerMessage();
+                } catch (Exception e) {
+                    System.err.printf("Exception getting message: %s%n", e);
+                    break;
+                }
+            }
+            else {
+                try {
+                    tryReconnect();
+                } catch (InterruptedException e){
+                    System.err.printf("Error waiting for reconnect: %s%n", e);
+                    System.err.printf("Aborting.%n");
+                    e.printStackTrace();
+                    this.tryReconnect = false;
+                }
             }
         }
     }
 
     public void disconnect() throws IOException {
+        this.tryReconnect = false;
         this.sock.close();
     }
 
@@ -113,6 +133,17 @@ public class IRCClient implements Runnable{
             throw new RIRCException("A channel should be joined before a message can be sent to it.");
         }
         writeMessage("PRIVMSG #" + channel + " :" + message);
+    }
+
+    private void tryReconnect() throws InterruptedException{
+        System.err.printf("Trying reconnect in %d seconds.%n", this.reconnecTimeMillis / 1000);
+        Thread.sleep(this.reconnecTimeMillis);
+
+        try {
+            connect();
+        } catch (IOException e){
+            System.err.printf("Still can't reconnect.%n");
+        }
     }
 
     private void getServerMessage() throws IOException{
