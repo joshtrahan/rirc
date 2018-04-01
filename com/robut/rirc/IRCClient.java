@@ -18,7 +18,6 @@
 
 package com.robut.rirc;
 
-import javax.management.OperationsException;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -98,7 +97,7 @@ public class IRCClient implements Runnable{
             }
             else {
                 try {
-                    tryReconnect();
+                    reconnect();
                 } catch (InterruptedException e){
                     System.err.printf("Error waiting for reconnect: %s%n", e);
                     System.err.printf("Aborting.%n");
@@ -135,7 +134,7 @@ public class IRCClient implements Runnable{
         writeMessage("PRIVMSG #" + channel + " :" + message);
     }
 
-    private void tryReconnect() throws InterruptedException{
+    private void reconnect() throws InterruptedException{
         this.channelsToJoin.addAll(this.channels);
         this.channels.clear();
         this.channelsJoinable = false;
