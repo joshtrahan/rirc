@@ -93,7 +93,7 @@ public class IRCClient implements Runnable{
                     getServerMessage();
                 } catch (Exception e) {
                     System.err.printf("Exception getting message: %s%n", e);
-                    break;
+                    e.printStackTrace();
                 }
             }
             else {
