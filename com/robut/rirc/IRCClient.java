@@ -120,8 +120,8 @@ public class IRCClient implements Runnable{
 
             if (!channels.contains(channelName)) {
                 channels.add(channelName);
+                writeMessage("JOIN #" + channelName);
             }
-            writeMessage("JOIN #" + channelName);
         }
         else{
             this.channelsToJoin.add(channelName);
@@ -136,6 +136,10 @@ public class IRCClient implements Runnable{
     }
 
     private void tryReconnect() throws InterruptedException{
+        this.channelsToJoin.addAll(this.channels);
+        this.channels.clear();
+        this.channelsJoinable = false;
+
         System.err.printf("Trying reconnect in %d seconds.%n", this.reconnecTimeMillis / 1000);
         Thread.sleep(this.reconnecTimeMillis);
 
