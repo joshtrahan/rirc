@@ -120,10 +120,25 @@ public class IRCClient implements Runnable{
             if (!channels.contains(channelName)) {
                 channels.add(channelName);
                 writeMessage("JOIN #" + channelName);
+                System.out.printf("Joined channel: %s%n", channelName);
             }
         }
         else{
             this.channelsToJoin.add(channelName);
+        }
+    }
+
+    public synchronized void leaveChannel(String channelName) throws IOException{
+        if (!this.channelsJoinable){
+            return;
+        }
+
+        System.out.printf("Leaving channel: %s%n", channelName);
+
+        if (channels.contains(channelName)) {
+            writeMessage("PART #" + channelName);
+            channels.remove(channelName);
+            System.out.printf("Left channel: %s%n", channelName);
         }
     }
 
